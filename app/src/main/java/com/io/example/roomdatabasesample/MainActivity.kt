@@ -3,6 +3,7 @@ package com.io.example.roomdatabasesample
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.io.example.roomdatabasesample.databinding.ActivityMainBinding
@@ -10,8 +11,7 @@ import com.io.example.roomdatabasesample.entities.Director
 import com.io.example.roomdatabasesample.entities.School
 import com.io.example.roomdatabasesample.entities.Student
 import com.io.example.roomdatabasesample.entities.Subject
-import com.io.example.roomdatabasesample.entities.relation.SchoolAndDirector
-import com.io.example.roomdatabasesample.entities.relation.StudentSubjectCrossRef
+import com.io.example.roomdatabasesample.entities.relation.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,14 +20,16 @@ class MainActivity : AppCompatActivity() {
     private val TAG = MainActivity::class.java.simpleName
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var textView: TextView
 
 //    private lateinit var database: SchoolDatabase
 
-//    @OptIn(DelicateCoroutinesApi::class)
+    //    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        textView = binding.textName
 /*
 //        Snackbar.make(binding.root, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
 
@@ -141,6 +143,7 @@ class MainActivity : AppCompatActivity() {
             StudentSubjectCrossRef("Hom Tanks", "Dating for programmers")
         )
         lifecycleScope.launch {
+            Log.e(TAG, "onCreate: launch")
             directors.forEach { dao.insertDirector(it) }
             schools.forEach { dao.insertSchool(it) }
             subjects.forEach { dao.insertSubject(it) }
@@ -154,6 +157,27 @@ class MainActivity : AppCompatActivity() {
             val studentsOfSubject = dao.getStudentsOfSubject("How to use Google")
 
             val subjectsOfStudent = dao.getSubjectsOfStudent("Beff Jezos")
+
+            var list :String? = null
+            for (s: SchoolAndDirector in schoolWithDirector) {
+                list =  "\bDirectorName :\b ${s.director.directorName}, Director SchoolName : ${s.director.schoolName}, SchoolName : ${s.school.schoolName}\n\n"
+            }
+            for (s: SchoolWithStudents in schoolWithStudents) {
+                for (s1:Student in s.students){
+                    list += "\bParentSchool:\b ${s.school}, ChildSchool: ${s1.schoolName}, StudentName: ${s1.studentName}, Semester: ${s1.semester}\n\n"
+                }
+            }
+            for (s: SubjectWithStudents in studentsOfSubject) {
+                for (s1:Student in s.students){
+                    list += "\bSubjectName:\b ${s.subject}, ChildSchool: ${s1.schoolName}, StudentName: ${s1.studentName}, Semester: ${s1.semester}\n\n"
+                }
+            }
+            for (s: StudentWithSubjects in subjectsOfStudent) {
+                for (s1:Subject in s.subjects){
+                    list += "\bStudentName:\b ${s.student}, SubjectName: ${s1.subjectName}\n\n"
+                }
+            }
+                textView.text = list!!.toString()
         }
     }
 
