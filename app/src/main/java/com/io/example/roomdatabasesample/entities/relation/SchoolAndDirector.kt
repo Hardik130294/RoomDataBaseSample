@@ -1,10 +1,12 @@
 package com.io.example.roomdatabasesample.entities.relation
 
 import androidx.room.Embedded
+import androidx.room.Entity
 import androidx.room.Relation
 import com.io.example.roomdatabasesample.entities.Director
 import com.io.example.roomdatabasesample.entities.School
 
+@Entity
 data class SchoolAndDirector(
     @Embedded val school: School,
     @Relation(
